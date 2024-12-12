@@ -1,5 +1,30 @@
 from django.db import models
 
+
+class Test (models.Model):
+    name = models.CharField(max_length=50)
+    age = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        db_table = "test"
+
+
+#create a model for address
+class Address(models.Model):
+    line1 = models.CharField(max_length=50)
+    line2 = models.CharField(max_length=50)
+    cityTown = models.CharField(max_length=50)
+    parish = models.CharField(max_length=50)
+    country = models.CharField(max_length=50)
+    zip_code = models.CharField(max_length=5)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "address"
+
+
 # create a model for a student
 class Student(models.Model):
     first_name = models.CharField(max_length=50)
