@@ -21,8 +21,8 @@ class ProgramOfStudy(models.Model):
 class ContactDetails(models.Model):
     email = models.EmailField(max_length=50)
     mobile_phone = models.CharField(max_length=12)
-    home_phone = models.CharField(max_length=12)
-    work_number = models.CharField(max_length=12)
+    home_phone = models.CharField(max_length=12, blank=True, null=True)
+    work_number = models.CharField(max_length=12, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     class Meta:
@@ -31,7 +31,7 @@ class ContactDetails(models.Model):
 #create a model for address
 class Address(models.Model):
     line1 = models.CharField(max_length=50)
-    line2 = models.CharField(max_length=50)
+    line2 = models.CharField(max_length=50, blank=True, null=True)
     cityTown = models.CharField(max_length=50)
     parish = models.CharField(max_length=50)
     country = models.CharField(max_length=50)
@@ -50,10 +50,13 @@ class Title(models.Model):
 
 # create a model for a next of kin
 class NextOfKin(models.Model):
+    # id of the relative/next of kin
     user = models.ForeignKey('User', related_name='next_of_kin', on_delete=models.CASCADE)
     relationship = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # student or member of staff
+    kin= models.ForeignKey('User', related_name='next_of_kin0', on_delete=models.CASCADE)  
     class Meta:
         db_table = "next_of_kin"
 
@@ -63,18 +66,23 @@ class User(models.Model):
     first_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    address = models.ForeignKey(Address, related_name='users', on_delete=models.CASCADE)
-    contact_details = models.ForeignKey(ContactDetails, related_name='users', on_delete=models.CASCADE)
-    next_of_kin0 = models.ForeignKey(NextOfKin, related_name='users', on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, related_name='users', on_delete=models.SET_NULL, blank=True, null=True)
+    contact_details = models.ForeignKey(ContactDetails, related_name='users', on_delete=models.SET_NULL, blank=True, null=True) 
+    next_of_kin1 = models.ForeignKey(NextOfKin, related_name='users', on_delete=models.SET_NULL, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.first_name + " " + self.last_name
+    
     class Meta:
         db_table = "user"
 
+
 # create a model for a student
 class Student(models.Model):
-    user = models.ForeignKey(User, related_name='students', on_delete=models.CASCADE)
-    program_of_study = models.ForeignKey('ProgramOfStudy', related_name='students', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='student', on_delete=models.CASCADE)
+    program_of_study = models.ForeignKey('ProgramOfStudy', related_name='students', on_delete=models.SET_NULL, blank=True, null=True)   
     gpa = models.DecimalField(max_digits=3, decimal_places=2)
     ucc_email = models.EmailField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -124,9 +132,9 @@ class Position(models.Model):
 # create a model for a staff
 class Staff(models.Model):
     user = models.ForeignKey(User, related_name='staff', on_delete=models.CASCADE)
-    department = models.ForeignKey(Department, related_name='staff', on_delete=models.CASCADE)
-    login = models.ForeignKey(Login, related_name='staff', on_delete=models.CASCADE)
-    position = models.ForeignKey(Position, related_name='staff', on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, related_name='staff', on_delete=models.SET_NULL, blank=True, null=True)
+    login = models.ForeignKey(Login, related_name='staff', on_delete=models.SET_NULL, blank=True, null=True)
+    position = models.ForeignKey(Position, related_name='staff', on_delete=models.SET_NULL, blank=True, null=True)
     ucc_email = models.EmailField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -164,9 +172,9 @@ class Semester(models.Model):
 # create a courseSchedule model
 class CourseSchedule(models.Model):
     course = models.ForeignKey(Course, related_name='course_schedules', on_delete=models.CASCADE)
-    course_section = models.ForeignKey(CourseSection, related_name='course_schedules', on_delete=models.CASCADE)
-    location = models.ForeignKey(Location, related_name='course_schedules', on_delete=models.CASCADE)
-    semester = models.ForeignKey(Semester, related_name='course_schedules', on_delete=models.CASCADE)
+    course_section = models.ForeignKey(CourseSection, related_name='course_schedules', on_delete=models.SET_NULL, blank=True, null=True)
+    location = models.ForeignKey(Location, related_name='course_schedules', on_delete=models.SET_NULL, blank=True, null=True)
+    semester = models.ForeignKey(Semester, related_name='course_schedules', on_delete=models.SET_NULL, blank=True, null=True)
     year = models.IntegerField()
     day1 = models.CharField(max_length=10)
     day2 = models.CharField(max_length=10)
@@ -181,7 +189,7 @@ class CourseSchedule(models.Model):
 # create a model for courseScheduleLecturers
 class CourseScheduleLecturer(models.Model):
     course_schedule = models.ForeignKey(CourseSchedule, related_name='course_schedule_lecturers', on_delete=models.CASCADE)
-    staff = models.ForeignKey(Staff, related_name='course_schedule_lecturers', on_delete=models.CASCADE)
+    lecturer = models.ForeignKey(Staff, related_name='course_schedule_lecturers', on_delete=models.SET_NULL, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -206,7 +214,7 @@ class CourseEnrollment(models.Model):
 #create a model for coursePrerequisite
 class CoursePrerequisite(models.Model):
     course = models.ForeignKey(Course, related_name='course_prerequisites', on_delete=models.CASCADE)
-    prerequisite = models.ForeignKey(Course, related_name='course_prerequisites0', on_delete=models.CASCADE)
+    prerequisite = models.ForeignKey(Course, related_name='course_prerequisites0', on_delete=models.SET_NULL, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
