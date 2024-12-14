@@ -38,8 +38,18 @@ urlpatterns = [
     path('faculty/', views.all_faculty),
     # Get a member of faculty
     path('staff/<int:id>/', views.get_staff),
-
-
+    # Get enrollment status
+    path('enrollment_status/', views.all_enrollment_status),
+    # Get all programs of study
+    path('program_of_study/', views.all_program_of_study),
+    # Get all departments
+    path('department/', views.all_departments),
+    # Get all positions
+    path('position/', views.all_positions),
+    # Get all course schedule lecturers
+    path('course_schedule_lecturer/', views.all_course_schedule_lecturer),
+    # Get all course schedules taught by a lecturer
+    path('course_schedule_lecturer/<int:id>/', views.course_schedule_lecturer),
 
 ]
 

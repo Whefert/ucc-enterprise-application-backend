@@ -1,4 +1,5 @@
 from .models import Address
+from django.db.models import Q
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import *
@@ -30,10 +31,16 @@ def all_users(request):
 # Get a student
 @api_view(['GET'])
 def get_student(request, id):
+    # query the database for enrolled student courses
+    student_courses = CourseEnrollment.objects.filter(student_id=id)
+    course_serializer = CourseEnrollmentSerializer(student_courses, many=True)
+
     # query the database for a student
     student = Student.objects.get(id=id)
-    serializer = StudentSerializer(student, many=False)
-    return Response(serializer.data)
+    student_serializer = StudentSerializer(student, many=False)
+
+    return Response({'student': student_serializer.data, 'courses': course_serializer.data})
+
 
 # Get student courses
 @api_view(['GET'])
@@ -63,8 +70,8 @@ def get_course(request, id):
 # Get all faculty
 @api_view(['GET'])
 def all_faculty(request):
-    # query the database for all staff that have a position of Lecturer
-    faculty = Staff.objects.filter(position__name='Lecturer')
+    # query the database for all members of faculty. Check that the position is not staff (basic)
+    faculty = Staff.objects.filter(~Q(position__name ='Staff'))
     
     serializer = StaffSerializer(faculty, many=True)
     return Response(serializer.data)
@@ -76,3 +83,53 @@ def get_staff(request, id):
     staff = Staff.objects.get(id=id)
     serializer = StaffSerializer(staff, many=False)
     return Response(serializer.data)
+
+# Get all enrollment status
+@api_view(['GET'])
+def all_enrollment_status(request):
+    # query the database for all enrollment statuses
+    statuses = EnrollmentStatus.objects.all()
+    serializer = EnrollmentStatusSerializer(statuses, many=True)
+    return Response(serializer.data)
+
+
+# Get all programs of study
+@api_view(['GET'])
+def all_program_of_study(request):
+    # query the database for all programs of study
+    programs = ProgramOfStudy.objects.all()
+    serializer = ProgramOfStudySerializer(programs, many=True)
+    return Response(serializer.data)
+
+# Get all departments
+@api_view(['GET'])
+def all_departments(request):
+    # query the database for all departments
+    departments = Department.objects.all()
+    serializer = DepartmentSerializer(departments, many=True)
+    return Response(serializer.data)
+
+# Get all positions
+@api_view(['GET'])
+def all_positions(request):
+    # query the database for all positions
+    positions = Position.objects.all()
+    serializer = PositionSerializer(positions, many=True)
+    return Response(serializer.data)
+
+# Get all course lectrers
+@api_view(['GET'])
+def all_course_schedule_lecturer(request):
+    # query the database for all course schedules lecturers
+    course_schedule_lecturers = CourseScheduleLecturer.objects.all()
+    serializer = CourseScheduleLecturerSerializer(course_schedule_lecturers, many=True)
+    return Response(serializer.data)
+
+# Get all course schedules taught by a lecturer
+@api_view(['GET'])
+def course_schedule_lecturer(request, id):
+    # query the database for all course schedules taught by a lecturer
+    course_schedule_lecturers = CourseScheduleLecturer.objects.filter(lecturer_id=id)
+    serializer = CourseScheduleLecturerSerializer(course_schedule_lecturers, many=True)
+    return Response(serializer.data)
+

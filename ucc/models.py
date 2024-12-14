@@ -190,7 +190,6 @@ class Staff(models.Model):
 class Student(models.Model):
     user = models.ForeignKey(User, related_name='student', on_delete=models.CASCADE)
     program_of_study = models.ForeignKey('ProgramOfStudy', related_name='students', on_delete=models.SET_NULL, blank=True, null=True)   
-    gpa = models.DecimalField(max_digits=3, decimal_places=2)
     ucc_email = models.EmailField(max_length=50)
     enrollment_status = models.ForeignKey(EnrollmentStatus, related_name='students', on_delete=models.SET_NULL, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -199,6 +198,32 @@ class Student(models.Model):
 
     def __str__(self):
         return str(self.id) + " - "+ self.user.first_name + " " + self.user.last_name
+    
+    # calculated field for the students gpa
+    @property
+    def calculate_gpa(self):
+        total = 0
+        count = 0
+        # find and courses the student is enrolled in
+        student_courses = CourseEnrollment.objects.filter(student=self)
+
+        # if no courses are found return 0
+        if not student_courses:
+            return 0
+
+        # loop through the courses and calculate the gpa
+        for course in student_courses:
+            total += course.quality_points
+            count += 1
+        return total/count
+    
+    def completed_credits(self):
+        total = 0
+        student_courses = CourseEnrollment.objects.filter(student=self)
+        for course in student_courses:
+            total += course.course_schedule.course.credits
+        return total
+
 
     class Meta:
         db_table = "student"
@@ -278,15 +303,83 @@ class CourseScheduleLecturer(models.Model):
 class CourseEnrollment(models.Model):
     student = models.ForeignKey(Student, related_name='course_enrollments', on_delete=models.CASCADE)
     course_schedule = models.ForeignKey(CourseSchedule, related_name='course_enrollments', on_delete=models.CASCADE)
-    courseWorkGrade = models.DecimalField(max_digits=5, decimal_places=2)
-    finalExamProjectGrade = models.DecimalField(max_digits=5, decimal_places=2)
-    finalGrade = models.DecimalField(max_digits=5, decimal_places=2)
-    letterGrade = models.CharField(max_length=2)
+    courseWorkGrade =models.FloatField()
+    finalExamProjectGrade = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.student.user.first_name + " " + self.student.user.last_name + " - " + self.course_schedule.course.code + " - " + self.course_schedule.course.title + " - " + self.course_schedule.location.name + " - " + self.course_schedule.semester.name + " - " + str(self.course_schedule.year)
+
+    @property
+    def calculate_gpa(self):
+        if self.final_grade >= 90:
+            return 4.0
+        elif self.final_grade >= 80:
+            return 3.67
+        elif self.final_grade >= 75:
+            return 3.50
+        elif self.final_grade >= 65:
+            return 3.0
+        elif self.final_grade >= 60:
+            return 2.67
+        elif self.final_grade >= 55:
+            return 2.33
+        elif self.final_grade >= 50:
+            return 2.00
+        elif self.final_grade >= 40:
+            return 1.67
+        else:
+            return 0.0
+
+    # calculate field for final grade
+    @property
+    def final_grade(self):
+        return self.courseWorkGrade*.6 + self.finalExamProjectGrade*.4
+    
+    # calculate letter grade
+    @property   
+    def letter_grade (self):
+        if self.final_grade >= 90:
+            return "A"
+        elif self.final_grade >= 80:
+            return "A-"
+        elif self.final_grade >= 75:
+            return "B+"
+        elif self.final_grade >= 65:
+            return "B"
+        elif self.final_grade >= 60:
+            return "B-"
+        elif self.final_grade >= 55:
+            return "C+"
+        elif self.final_grade >= 50:
+            return "C"
+        elif self.final_grade >= 40:
+            return "D"
+        else:
+            return "F"
+
+    @property
+    def quality_points(self):
+        if self.final_grade >= 90:
+            return 4.0
+        elif self.final_grade >= 80:
+            return 3.67
+        elif self.final_grade >= 75:
+            return 3.50
+        elif self.final_grade >= 65:
+            return 3.0
+        elif self.final_grade >= 60:
+            return 2.67
+        elif self.final_grade >= 55:
+            return 2.33
+        elif self.final_grade >= 50:
+            return 2.00
+        elif self.final_grade >= 40:
+            return 1.67
+        else:
+            return 0.0
+
 
     class Meta:
         db_table = "course_enrollment"

@@ -17,8 +17,6 @@ class PositionSerializer(serializers.ModelSerializer):
         model = Position
         fields = '__all__'
 
-
-
 class CourseSectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseSection
@@ -49,6 +47,12 @@ class CourseScheduleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CourseEnrollmentSerializer(serializers.ModelSerializer):
+    final_grade = serializers.ReadOnlyField()
+    calculate_gpa = serializers.ReadOnlyField()
+    letter_grade = serializers.ReadOnlyField()
+    quality_points = serializers.ReadOnlyField()
+    
+
     course_schedule = CourseScheduleSerializer(many=False)
     class Meta:
         model = CourseEnrollment
@@ -90,9 +94,19 @@ class StaffSerializer(serializers.ModelSerializer):
         model = Staff
         fields = '__all__'
 
+class EnrollmentStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnrollmentStatus
+        fields = '__all__'
 
 # Student serializer
 class StudentSerializer(serializers.ModelSerializer):
+    calculate_gpa = serializers.ReadOnlyField()
+    completed_credits = serializers.ReadOnlyField()
+    first_name = serializers.CharField(source = 'user.first_name', read_only=True)
+    last_name = serializers.CharField(source = 'user.last_name', read_only=True)
+    address = serializers.CharField(source = 'user.address.line1', read_only=True)
+    personal_email = serializers.CharField(source = 'user.contact_details.email', read_only=True)
     user = UserSerializer(many=False)
     advisor = StaffSerializer(many=False)
     enrollment_status = serializers.CharField(source = 'enrollment_status.status', read_only=True)
@@ -102,3 +116,16 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         fields = "__all__"
 
+# Program of study serializer
+class ProgramOfStudySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProgramOfStudy
+        fields = "__all__"
+
+# Course schedule lecturer serializer
+class CourseScheduleLecturerSerializer(serializers.ModelSerializer):
+    course_schedule = CourseScheduleSerializer(many=False)
+    lecturer = StaffSerializer(many=False)
+    class Meta:
+        model = CourseScheduleLecturer
+        fields = "__all__"
