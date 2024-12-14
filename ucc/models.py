@@ -303,8 +303,8 @@ class CourseScheduleLecturer(models.Model):
 class CourseEnrollment(models.Model):
     student = models.ForeignKey(Student, related_name='course_enrollments', on_delete=models.CASCADE)
     course_schedule = models.ForeignKey(CourseSchedule, related_name='course_enrollments', on_delete=models.CASCADE)
-    courseWorkGrade =models.FloatField()
-    finalExamProjectGrade = models.FloatField()
+    courseWorkGrade =models.FloatField(default=50)
+    finalExamProjectGrade = models.FloatField(default=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -313,6 +313,7 @@ class CourseEnrollment(models.Model):
 
     @property
     def calculate_gpa(self):
+  
         if self.final_grade >= 90:
             return 4.0
         elif self.final_grade >= 80:
@@ -335,11 +336,12 @@ class CourseEnrollment(models.Model):
     # calculate field for final grade
     @property
     def final_grade(self):
-        return self.courseWorkGrade*.6 + self.finalExamProjectGrade*.4
+         return self.courseWorkGrade*.6 + self.finalExamProjectGrade*.4
     
     # calculate letter grade
     @property   
     def letter_grade (self):
+       
         if self.final_grade >= 90:
             return "A"
         elif self.final_grade >= 80:
@@ -361,6 +363,7 @@ class CourseEnrollment(models.Model):
 
     @property
     def quality_points(self):
+
         if self.final_grade >= 90:
             return 4.0
         elif self.final_grade >= 80:

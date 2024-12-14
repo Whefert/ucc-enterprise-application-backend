@@ -133,3 +133,18 @@ def course_schedule_lecturer(request, id):
     serializer = CourseScheduleLecturerSerializer(course_schedule_lecturers, many=True)
     return Response(serializer.data)
 
+# Get all course enrollments
+@api_view(['GET'])
+def all_course_enrollments(request):
+    # query the database for all course enrollments
+    course_enrollments = CourseEnrollment.objects.all()
+    serializer = CourseEnrollmentSerializer(course_enrollments, many=True)
+    return Response(serializer.data)
+
+# Get course enrollment for a course
+@api_view(['GET'])
+def course_enrollment(request, id):
+    # query the database for all course enrollments where the course schedule has a course with an id of the id
+    course_enrollments = CourseEnrollment.objects.filter(course_schedule__course_id=id)
+    serializer = CourseEnrollmentSerializer(course_enrollments, many=True)
+    return Response(serializer.data)

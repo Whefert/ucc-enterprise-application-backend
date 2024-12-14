@@ -47,10 +47,10 @@ class CourseScheduleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CourseEnrollmentSerializer(serializers.ModelSerializer):
-    final_grade = serializers.ReadOnlyField()
-    calculate_gpa = serializers.ReadOnlyField()
-    letter_grade = serializers.ReadOnlyField()
-    quality_points = serializers.ReadOnlyField()
+    final_grade = serializers.ReadOnlyField(default='90', initial='90')
+    calculate_gpa = serializers.ReadOnlyField(default='0.0', initial='0.0')
+    letter_grade = serializers.ReadOnlyField(default='A-', initial='A-')
+    quality_points = serializers.ReadOnlyField(default='3', initial='3')
     
 
     course_schedule = CourseScheduleSerializer(many=False)
@@ -111,6 +111,7 @@ class StudentSerializer(serializers.ModelSerializer):
     advisor = StaffSerializer(many=False)
     enrollment_status = serializers.CharField(source = 'enrollment_status.status', read_only=True)
     program_of_study = serializers.CharField(source = 'program_of_study.name', read_only=True)
+    degree_level = serializers.CharField(source = 'program_of_study.degree_level', read_only=True)
 
     class Meta:
         model = Student

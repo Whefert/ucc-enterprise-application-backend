@@ -30,10 +30,14 @@ urlpatterns = [
     # Get a student
     path('student/<int:id>/', views.get_student),
     path('user/', views.all_users),
-    # Get al courses
+    # Get all courses
     path('course/', views.all_courses),
     # Get a course
     path('course/<int:id>/', views.get_course),
+    # Get all course enrollments
+    path('course_enrollment/', views.all_course_enrollments),
+    # Get a course enrollment
+    path('course_enrollment/<int:id>/', views.course_enrollment),
     # Get faculty
     path('faculty/', views.all_faculty),
     # Get a member of faculty

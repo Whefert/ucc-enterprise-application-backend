@@ -1,4 +1,12 @@
 #!/usr/bin/env python
+
+# Name of Enterprise App: UCC Vault
+# Developers:
+# Version: 1.0
+# Version Date: December 14, 2024
+# Purpose: Enterprise application that encompasses all of the UCC's academic and strategic business units. The first version of the app 
+# focuses primarily on data related to the registry department
+
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
