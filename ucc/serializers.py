@@ -17,10 +17,7 @@ class PositionSerializer(serializers.ModelSerializer):
         model = Position
         fields = '__all__'
 
-class StaffSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Staff
-        fields = '__all__'
+
 
 class CourseSectionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,11 +40,20 @@ class SemesterSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CourseScheduleSerializer(serializers.ModelSerializer):
+    location = LocationSerializer(many=False)
+    course_section = CourseSectionSerializer(many=False)
+    semester = SemesterSerializer(many=False)
+    course = CourseSerializer(many=False)
     class Meta:
         model = CourseSchedule
         fields = '__all__'
 
- 
+class CourseEnrollmentSerializer(serializers.ModelSerializer):
+    course_schedule = CourseScheduleSerializer(many=False)
+    class Meta:
+        model = CourseEnrollment
+        fields = '__all__'
+
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -76,14 +82,23 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+class StaffSerializer(serializers.ModelSerializer):
+    position = serializers.CharField(source = 'position.name', read_only=True)
+    user = UserSerializer(many=False)
+    department = serializers.CharField(source = 'department.name', read_only=True)
+    class Meta:
+        model = Staff
+        fields = '__all__'
+
+
 # Student serializer
 class StudentSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False)
+    advisor = StaffSerializer(many=False)
+    enrollment_status = serializers.CharField(source = 'enrollment_status.status', read_only=True)
     program_of_study = serializers.CharField(source = 'program_of_study.name', read_only=True)
 
     class Meta:
         model = Student
         fields = "__all__"
-
-
 

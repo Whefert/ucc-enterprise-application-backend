@@ -5,6 +5,10 @@ class DegreeLevel(models.Model):
     level = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.level
+
     class Meta:
         db_table = "degree_level"
 
@@ -14,6 +18,10 @@ class ProgramOfStudy(models.Model):
     degree_level = models.ForeignKey(DegreeLevel, related_name='programs_of_study', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name + " - " + self.degree_level.level
+
     class Meta:
         db_table = "program_of_study"
        
@@ -25,6 +33,10 @@ class ContactDetails(models.Model):
     work_number = models.CharField(max_length=12, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.email + " " + self.mobile_phone
+
     class Meta:
         db_table = "contact_details"
 
@@ -37,6 +49,10 @@ class Address(models.Model):
     country = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.line1 + ", " + self.cityTown + ", " + self.parish + ", " + self.country
+
     class Meta:
         db_table = "address"
 
@@ -45,6 +61,10 @@ class Title(models.Model):
     title = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
     class Meta:
         db_table = "title"
 
@@ -57,6 +77,10 @@ class NextOfKin(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     # student or member of staff
     kin= models.ForeignKey('User', related_name='next_of_kin0', on_delete=models.CASCADE)  
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name + " - " + self.relationship + " to " + self.kin.first_name + " " + self.kin.last_name
+
     class Meta:
         db_table = "next_of_kin"
 
@@ -78,17 +102,19 @@ class User(models.Model):
     class Meta:
         db_table = "user"
 
-
-# create a model for a student
-class Student(models.Model):
-    user = models.ForeignKey(User, related_name='student', on_delete=models.CASCADE)
-    program_of_study = models.ForeignKey('ProgramOfStudy', related_name='students', on_delete=models.SET_NULL, blank=True, null=True)   
-    gpa = models.DecimalField(max_digits=3, decimal_places=2)
-    ucc_email = models.EmailField(max_length=50)
+# create a model for enrollment status
+class EnrollmentStatus(models.Model):
+    status = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.status
+
     class Meta:
-        db_table = "student"
+        db_table = "enrollment_status"
+
+
 
 # create a model for a course
 class Course(models.Model):
@@ -98,14 +124,22 @@ class Course(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.code + " - " + self.title
+
     class Meta:
         db_table = "course"
+
+
 
 # create a model for a department   
 class Department(models.Model):
     name = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = "department"
@@ -117,6 +151,9 @@ class Login(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.username + " " + self.password
+
     class Meta:
         db_table = "login"
 
@@ -125,6 +162,9 @@ class Position(models.Model):
     name = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = "position"
@@ -139,14 +179,40 @@ class Staff(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return str(self.id)+ " - " + self.user.first_name + " " + self.user.last_name
+
     class Meta:
         db_table = "staff"
+
+
+# create a model for a student
+class Student(models.Model):
+    user = models.ForeignKey(User, related_name='student', on_delete=models.CASCADE)
+    program_of_study = models.ForeignKey('ProgramOfStudy', related_name='students', on_delete=models.SET_NULL, blank=True, null=True)   
+    gpa = models.DecimalField(max_digits=3, decimal_places=2)
+    ucc_email = models.EmailField(max_length=50)
+    enrollment_status = models.ForeignKey(EnrollmentStatus, related_name='students', on_delete=models.SET_NULL, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    advisor = models.ForeignKey('Staff', related_name='students', on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.id) + " - "+ self.user.first_name + " " + self.user.last_name
+
+    class Meta:
+        db_table = "student"
+
+
 
 # create a model for courseSection
 class CourseSection(models.Model):
     courseSection = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.courseSection
 
     class Meta:
         db_table = "course_section"
@@ -157,6 +223,8 @@ class Location(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.name
     class Meta:
         db_table = "location"
 
@@ -165,6 +233,9 @@ class Semester(models.Model):
     name = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = "semester"
@@ -183,6 +254,9 @@ class CourseSchedule(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.course.code + " - " + self.course.title + " - " + self.location.name + " - " + self.semester.name + " - " + str(self.year)
+
     class Meta:
         db_table = "course_schedule"
 
@@ -193,6 +267,9 @@ class CourseScheduleLecturer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.course_schedule.course.code + " - " + self.course_schedule.course.title + " - " + self.lecturer.user.first_name + " " + self.lecturer.user.last_name + " - " + self.course_schedule.location.name + " - " + self.course_schedule.semester.name + " - " + str(self.course_schedule.year)
+
     class Meta:
         db_table = "course_schedule_lecturer"
 
@@ -201,12 +278,15 @@ class CourseScheduleLecturer(models.Model):
 class CourseEnrollment(models.Model):
     student = models.ForeignKey(Student, related_name='course_enrollments', on_delete=models.CASCADE)
     course_schedule = models.ForeignKey(CourseSchedule, related_name='course_enrollments', on_delete=models.CASCADE)
-    courseWorkGrade = models.DecimalField(max_digits=3, decimal_places=2)
-    finalExamProjectGrade = models.DecimalField(max_digits=3, decimal_places=2)
-    finalGrade = models.DecimalField(max_digits=3, decimal_places=2)
+    courseWorkGrade = models.DecimalField(max_digits=5, decimal_places=2)
+    finalExamProjectGrade = models.DecimalField(max_digits=5, decimal_places=2)
+    finalGrade = models.DecimalField(max_digits=5, decimal_places=2)
     letterGrade = models.CharField(max_length=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.student.user.first_name + " " + self.student.user.last_name + " - " + self.course_schedule.course.code + " - " + self.course_schedule.course.title + " - " + self.course_schedule.location.name + " - " + self.course_schedule.semester.name + " - " + str(self.course_schedule.year)
 
     class Meta:
         db_table = "course_enrollment"

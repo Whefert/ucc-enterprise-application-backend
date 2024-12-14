@@ -22,8 +22,24 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('address/', views.all_addresses),
+    # Get all students
     path('student/', views.all_students),
+    # Get student courses
+    path('student/<int:id>/courses/', views.student_courses),
+
+    # Get a student
+    path('student/<int:id>/', views.get_student),
     path('user/', views.all_users),
+    # Get al courses
+    path('course/', views.all_courses),
+    # Get a course
+    path('course/<int:id>/', views.get_course),
+    # Get faculty
+    path('faculty/', views.all_faculty),
+    # Get a member of faculty
+    path('staff/<int:id>/', views.get_staff),
+
+
 
 ]
 
