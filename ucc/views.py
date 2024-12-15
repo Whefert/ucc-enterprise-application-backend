@@ -148,3 +148,19 @@ def course_enrollment(request, id):
     course_enrollments = CourseEnrollment.objects.filter(course_schedule__course_id=id)
     serializer = CourseEnrollmentSerializer(course_enrollments, many=True)
     return Response(serializer.data)
+
+# Login
+@api_view(['POST'])
+def login(request):
+    # query the database for a user with the username and password
+    login = User.objects.filter(username=request.POST.get('username'), password=request.POST.get('password')).exists()
+    return Response(login)
+
+
+# Get prerequisites for a course
+@api_view(['GET'])
+def course_prerequisites(request, id):
+    # query the database for all prerequisites for a course
+    prerequisites = CoursePrerequisite.objects.filter(course_id=id)
+    serializer = CoursePrerequisiteSerializer(prerequisites, many=True)
+    return Response(serializer.data)

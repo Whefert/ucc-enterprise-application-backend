@@ -46,17 +46,6 @@ class CourseScheduleSerializer(serializers.ModelSerializer):
         model = CourseSchedule
         fields = '__all__'
 
-class CourseEnrollmentSerializer(serializers.ModelSerializer):
-    final_grade = serializers.ReadOnlyField(default='90', initial='90')
-    calculate_gpa = serializers.ReadOnlyField(default='0.0', initial='0.0')
-    letter_grade = serializers.ReadOnlyField(default='A-', initial='A-')
-    quality_points = serializers.ReadOnlyField(default='3', initial='3')
-    
-
-    course_schedule = CourseScheduleSerializer(many=False)
-    class Meta:
-        model = CourseEnrollment
-        fields = '__all__'
 
 
 
@@ -117,6 +106,19 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         fields = "__all__"
 
+class CourseEnrollmentSerializer(serializers.ModelSerializer):
+    final_grade = serializers.ReadOnlyField()
+    calculate_gpa = serializers.ReadOnlyField(default='0.0', initial='0.0')
+    letter_grade = serializers.ReadOnlyField()
+    quality_points = serializers.ReadOnlyField()
+    student = StudentSerializer(many=False)
+    
+    course_schedule = CourseScheduleSerializer(many=False)
+    class Meta:
+        model = CourseEnrollment
+        fields = '__all__'
+
+
 # Program of study serializer
 class ProgramOfStudySerializer(serializers.ModelSerializer):
     class Meta:
@@ -129,4 +131,13 @@ class CourseScheduleLecturerSerializer(serializers.ModelSerializer):
     lecturer = StaffSerializer(many=False)
     class Meta:
         model = CourseScheduleLecturer
+        fields = "__all__"
+
+
+# Coure prerequisite serializer
+class CoursePrerequisiteSerializer(serializers.ModelSerializer):
+    course = CourseSerializer(many=False)
+    prerequisite = CourseSerializer(many=False)
+    class Meta:
+        model = CoursePrerequisite
         fields = "__all__"

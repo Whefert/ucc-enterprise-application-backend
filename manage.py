@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Name of Enterprise App: UCC Vault
-# Developers:
+# Developers:20204527- Jaevanie Ferguson, 20202583 - Jefferson Daley, 20214987 - Jadian Ellis, 20211691 - Shanieka Davis
 # Version: 1.0
 # Version Date: December 14, 2024
 # Purpose: Enterprise application that encompasses all of the UCC's academic and strategic business units. The first version of the app 

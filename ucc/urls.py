@@ -26,6 +26,8 @@ urlpatterns = [
     path('student/', views.all_students),
     # Get student courses
     path('student/<int:id>/courses/', views.student_courses),
+    # Login
+    path('login/', views.login),
 
     # Get a student
     path('student/<int:id>/', views.get_student),
@@ -54,6 +56,8 @@ urlpatterns = [
     path('course_schedule_lecturer/', views.all_course_schedule_lecturer),
     # Get all course schedules taught by a lecturer
     path('course_schedule_lecturer/<int:id>/', views.course_schedule_lecturer),
+    # Get course prerequisites
+    path('course/<int:id>/prerequisites/', views.course_prerequisites),
 
 ]
 

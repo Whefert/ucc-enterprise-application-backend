@@ -219,7 +219,7 @@ class Student(models.Model):
     
     def completed_credits(self):
         total = 0
-        student_courses = CourseEnrollment.objects.filter(student=self)
+        student_courses = CourseEnrollment.objects.filter(student=self, courseWorkGrade__gt=40, finalExamProjectGrade__gt=40)
         for course in student_courses:
             total += course.course_schedule.course.credits
         return total
@@ -303,8 +303,8 @@ class CourseScheduleLecturer(models.Model):
 class CourseEnrollment(models.Model):
     student = models.ForeignKey(Student, related_name='course_enrollments', on_delete=models.CASCADE)
     course_schedule = models.ForeignKey(CourseSchedule, related_name='course_enrollments', on_delete=models.CASCADE)
-    courseWorkGrade =models.FloatField(default=50)
-    finalExamProjectGrade = models.FloatField(default=50)
+    courseWorkGrade =models.FloatField(default=0)
+    finalExamProjectGrade = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -393,6 +393,9 @@ class CoursePrerequisite(models.Model):
     prerequisite = models.ForeignKey(Course, related_name='course_prerequisites0', on_delete=models.SET_NULL, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.course.code + " - " + self.course.title + " REQUIRES " + self.prerequisite.code + " - " + self.prerequisite.title
 
     class Meta:
         db_table = "course_prerequisite"
